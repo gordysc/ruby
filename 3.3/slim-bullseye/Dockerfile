@@ -143,4 +143,14 @@ ENV PATH $GEM_HOME/bin:$PATH
 # adjust permissions of a few directories for running "gem install" as an arbitrary user
 RUN mkdir -p "$GEM_HOME" && chmod 1777 "$GEM_HOME"
 
+# Ruby 3.3.0 patch
+RUN apt update && apt install -y build-essential wget autoconf
+RUN wget https://github.com/postmodern/ruby-install/releases/download/v0.9.3/ruby-install-0.9.3.tar.gz \
+  && tar -xzvf ruby-install-0.9.3.tar.gz \
+  && cd ruby-install-0.9.3/ \
+  && make install
+RUN ruby-install -p https://github.com/ruby/ruby/pull/9371.diff ruby 3.3.0
+
+ENV PATH="/opt/rubies/ruby-3.3.0/bin:${PATH}"
+
 CMD [ "irb" ]
